@@ -1,11 +1,13 @@
 import { useState } from "react";
 import authAPI from "../API/authAPI";
 import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 import { Link } from "react-router-dom";
 import Logo from "../assets/Logo";
 
 const Register = () => {
+  const navigate = useNavigate();
   const [details, setDetails] = useState({
     email: "",
     password: "",
@@ -26,14 +28,27 @@ const Register = () => {
       !confirmPassword
     ) {
       toast.error("Please fill the credentials");
-    } else if(!(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/).test(details.email)){
-      toast.warn("Invalid email")
-    }
-    else if (details.password !== confirmPassword) {
+    } else if (
+      !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+        details.email
+      )
+    ) {
+      toast.warn("Invalid email");
+    } else if (details.password !== confirmPassword) {
       toast.error("Password does`not match");
     } else {
-      const response = await registrationAPI(details);
-      console.log(response);
+      try {
+        const response = await registrationAPI(details);
+        console.log("response is", response);
+        toast.success("succesfully Registerd , Please Login", { delay: 0 });
+        setTimeout(() => {
+          navigate("/login");
+        }, 900);
+      } catch (error) {
+        if (error?.error?.response?.data?.message)
+          toast.error(error?.error?.response?.data?.message, { theme: "dark" });
+        console.log("error is", error);
+      }
     }
   };
   const inputStyle = "border border-slate-500 p-2 w-full ";
@@ -57,7 +72,7 @@ const Register = () => {
             onChange={changeInputDetails}
           />
           <input
-            type="text"
+            type="password"
             className={inputStyle}
             placeholder="Password"
             name="password"
@@ -65,7 +80,7 @@ const Register = () => {
             onChange={changeInputDetails}
           />
           <input
-            type="text"
+            type="password"
             className={inputStyle}
             placeholder="Confirm password"
             value={confirmPassword}

@@ -2,13 +2,17 @@ import express from 'express';
 import bodyParser from "body-parser";
 import morgan from 'morgan';
 import connectToDatabase from './Connection/mongoDB.js'
-import cors from 'cors'
+import cors from 'cors';
+import * as dotenv from "dotenv";
+
 
 
 const app = express();
 
 //MongoDb connection
 connectToDatabase();
+dotenv.config();
+
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
